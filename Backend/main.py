@@ -14,9 +14,8 @@ app = FastAPI(docs_url=None)
 async def custom_swagger_ui_html():
     return get_swagger_ui_html(openapi_url="/openapi.json", title="Skill-Capital API")
 
-origins = [
-    "http://localhost:3000", 
-    "http://127.0.0.1:3000" 
+origins = [ 
+    "http://3.84.242.127:3000" 
 ]
 
 app.add_middleware(
@@ -27,10 +26,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-DB_HOST = 'localhost'
+DB_HOST = '172.17.0.2'
 DB_NAME = 'postgres'
 DB_USER = 'postgres'
-DB_PASSWORD = 'jayanth'
+DB_PASSWORD = 'python'
 DB_PORT = '5432'
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
