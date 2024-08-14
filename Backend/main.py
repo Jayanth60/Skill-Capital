@@ -15,7 +15,8 @@ async def custom_swagger_ui_html():
     return get_swagger_ui_html(openapi_url="/openapi.json", title="Skill-Capital API")
 
 origins = [ 
-    "http://3.84.242.127:3000" 
+    "http://3.84.242.127:3000",
+    "http://127.0.0.1:3000"
 ]
 
 app.add_middleware(
