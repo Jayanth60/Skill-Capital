@@ -1,6 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
 import axios from 'axios'; // Import axios
+// import { useRouter } from 'next/router';
+// import { Navigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
+
+
+
+
+
 
 function Logins() {
   const [logins, setLogins] = useState([]);
@@ -8,14 +16,34 @@ function Logins() {
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const router =useRouter();
+  const [loggedIn, setLoggedIn] = useState(false); 
+  const [rememberMe, setRememberMe] = useState(false); // Added state for Remember Me
+
+  // const [isLogedIn,setLoggedIn] =useState(false);
+  // const [rememberMe,setRememberMe]=useState(false);
+ 
+  
+  
+  
+  
 
   useEffect(() => {
     fetchLogins();
+    // const userToken=localStorage.getItem('userToken');
+    // if(userToken){
+    //   setLoggedIn(true);
+    // }
+    const userToken = localStorage.getItem('userToken');
+    if (userToken) {
+      // router.push('/home/homepage');
+      setLoggedIn(true); // Redirect if token exists
+    }
   }, []);
 
   const fetchLogins = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/');
+      const response = await axios.get('http://localhost:8000/login');
 
       setLogins(response.data);
       console.log(response.data);
@@ -57,17 +85,37 @@ function Logins() {
 
     if (isEmailValid && isPasswordValid) {
       try {
-        const response = await axios.post('http://3.84.242.127:8000/login', {
+        const response = await axios.post('https://3.85.190.207:8000/login', {
           email,
           password
         });
-
+        //  if(response.status===200){
+        //   router.push('/homepage');
+        //   console.log(response.data)
+        //  } 
+        if (response.status === 200) {
+          if (rememberMe) {
+            localStorage.setItem('userToken', response.data.token); // Store token if Remember Me is checked
+          } else {
+            sessionStorage.setItem('userToken', response.data.token); // Use session storage for session-only
+          }
+          setLoggedIn(true);
+          router.push('/home/homepage');
+          console.log(response.data);
+        }
+        
+        //  < Navigate to ="./home/homepage"/> 
         console.log('Form submitted successfully:', response.data);
-
+        // router.push('/home/homepage'); 
         // Handle success (e.g., redirect to another page or show a success message)
         
       } catch (error) {
         console.error('Error during form submission:', error.response?.data || error.message);
+        // window.alert('failed to login')
+        if(error.response && error.response.status ===401){
+          console.error('Error response:', error.response);
+          setLoginError('Invalid username or password');
+        }
         // Handle errors (e.g., display an error message to the user)
       }
     }
@@ -77,6 +125,23 @@ function Logins() {
     setEmailError('');
     setPasswordError('');
   };
+  const handleCheckboxChange = () => {
+    setRememberMe(!rememberMe); // Toggle Remember Me state
+  };
+  
+  const handleLogout = () => {
+    localStorage.removeItem('userToken');
+    sessionStorage.removeItem('userToken');
+    setLoggedIn(false);
+  };
+  // const handleCheckboxChange =()=>{
+  //   setRememberMe(!rememberMe);
+  // }
+  // const handleLogin =()=>{
+  //   if(rememberMe){
+  //     localStorage.setItem('userToken','loginCommandingSuccessfull')
+  //   }
+  // }
 
   return (
     <main>
@@ -126,7 +191,7 @@ function Logins() {
               </button>
             </div>
             <div className="mt-10">
-              <input type="checkbox" className="h-4 w-5" /><label className="pl-1">Remember me</label>
+              <input type="checkbox"  className="h-4 w-5" checked={rememberMe} onChange={handleCheckboxChange}   /><label className="pl-1">Remember me</label>
 
               <p className="text-gray-600 text-center pt-10">
                 ©2024, All rights reserved
@@ -140,6 +205,9 @@ function Logins() {
           <p className="text-center text-lg text-gray-700 w-3/4">Centralize customer data effortlessly. Streamline communication, sales, and support for seamless growth.</p>
           <img src="/images/pinkcrm.png" alt="skill-capital img" />
         </div>
+      </div>
+      <div>
+        <button onSubmit={handleLogout}>logout</button>
       </div>
     </main>
   );

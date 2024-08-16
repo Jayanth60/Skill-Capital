@@ -1,4 +1,6 @@
 import Image from "next/image";
+import { BrowserRouter as Router,Routes ,Route} from "react-router-dom";
+import HomePage from './home/homepage';
 
 export default function Home() {
   return (
@@ -108,6 +110,11 @@ export default function Home() {
           </p>
         </a>
       </div>
+      <Router>
+        <Routes>
+          <Route path="./home/homepage" element={<homepage/>}/>
+        </Routes>
+      </Router>
     </main>
   );
 }
